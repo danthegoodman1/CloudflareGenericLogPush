@@ -1,7 +1,11 @@
+import { logShipper } from "./shipper"
+import { LogPayload } from "./types"
+
 export interface Env {
 	TOKEN: string
-	DATASET: string
 }
+
+export type LogShipperFunction = (logs: LogPayload[], env: Env) => Promise<Response>
 
 export default {
 	async fetch(
@@ -10,8 +14,8 @@ export default {
 		ctx: ExecutionContext
 	): Promise<Response> {
 		if (request.headers.get("content-length") === "4") {
-			console.log("got test", env.DATASET, env.TOKEN)
-			return new Response("f u test")
+			console.log("got test")
+			return new Response("ok")
 		}
 		if (request.headers.get("content-encoding") === "gzip") {
 			// This is a logpush batch
@@ -24,15 +28,18 @@ export default {
 				})
 			}
 
-			return fetch(`https://cloud.axiom.co/api/v1/datasets/${env.DATASET}/ingest`, {
-				method: "POST",
-				headers: {
-					"Authorization": `Bearer ${env.TOKEN}`,
-					"content-encoding": "gzip",
-					"content-type": "application/json"
-				},
-				body: request.body
-			})
+			// Get the body payload, it's gzip encoded
+			const ds = new DecompressionStream("gzip");
+			const tds = new TextDecoderStream();
+
+			const chunks = await request.body!.pipeThrough(ds).pipeThrough(tds);
+
+			let data = "";
+			for await (let chunk of chunks) {
+				data = data + chunk;
+			}
+
+			return logShipper(JSON.parse(data) as LogPayload[], env)
 		}
 		return new Response("ok")
 	},
