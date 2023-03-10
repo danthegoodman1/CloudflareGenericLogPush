@@ -95,7 +95,6 @@ export const googleDestinationFunction: LogShipperFunction = async (logs: LogPay
   )
 
   const token = `${header}.${payload}.${signature}`
-
   const entries: any[] = []
   for (const log of logs) {
     entries.push(...log.Logs.map((line) => {
@@ -113,7 +112,8 @@ export const googleDestinationFunction: LogShipperFunction = async (logs: LogPay
           rayID: log.Event.RayID
         },
         jsonPayload: {
-          message: line.Message,
+          message: typeof line.Message[0] === "string" ? line.Message[0] : line.Message, // pretty print if we can
+          messageParams: typeof line.Message[0] === "string" ? undefined : line.Message // if we can pretty print the rest of the items can be fetched like `jsonParams.messageParams = X` or for objects `jsonParams.messageParams.key="val"` since GCP automatically iterates on arrays
         }
       }
     }),
