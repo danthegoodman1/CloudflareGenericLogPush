@@ -102,7 +102,7 @@ export const googleDestinationFunction: LogShipperFunction = async (logs: LogPay
       return {
         severity: (() => {
           if (line.Level === "log") {
-            return "info"
+            return "INFO"
           }
           return line.Level.toUpperCase()
         })(),
