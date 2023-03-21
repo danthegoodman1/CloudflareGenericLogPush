@@ -44,6 +44,10 @@ export interface Env {
 	ServiceAccountJSON: string
 }
 
+function isObject(value: any): boolean {
+  return value && typeof value === "object" && !Array.isArray(value);
+}
+
 export const googleDestinationFunction: LogShipperFunction = async (logs: LogPayload[], env: Env) => {
   const sa = JSON.parse(env.ServiceAccountJSON) as ServiceAccount
 
@@ -132,8 +136,11 @@ export const googleDestinationFunction: LogShipperFunction = async (logs: LogPay
         },
         jsonPayload: {
           message: line.Message[0],
-          // Will convert `['a', 'b'] to `{'0': 'a', '1': 'b'}`, safe to run on empty arrays or length === 1
-          ...Object.fromEntries(Object.entries(line.Message.slice(1)))
+          ...line.Message.length === 2 && isObject(line.Message[1]) ?
+            Object.fromEntries(Object.entries(line.Message.slice(1))) // If we have an object as the only other arg, expand it
+              : line.Message.length == 1 ?
+                {} : // add nothing if only one item
+                  Object.fromEntries(Object.entries(line.Message.slice(1))) // Will convert `['a', 'b'] to `{'0': 'a', '1': 'b'}`, safe to run on empty arrays or length === 1
         }
       }
     }),
