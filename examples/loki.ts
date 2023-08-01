@@ -19,7 +19,7 @@ export const logShipper: LogShipperFunction = async (
                 cluster: "cloudflarelogpush",
                 level: log.Level === "log" ? "info" : log.Level,
               },
-              values: [[log.TimestampMs, log.Message]],
+              values: [[(log.TimestampMs*1000*1000).toString(), JSON.stringify(log.Message)]],
             }
           })
         : []),
@@ -30,13 +30,12 @@ export const logShipper: LogShipperFunction = async (
                 cluster: "cloudflarelogpush",
                 level: "error",
               },
-              values: [[e.TimestampMs, e.Message]],
+              values: [[(e.TimestampMs*1000*1000).toString(), JSON.stringify(e.Message)]],
             }
           })
         : []),
     ]
   }).flat()
-  console.log('streams', streams)
   return await fetch(u, {
     method: "POST",
     headers: {
