@@ -3,9 +3,10 @@ import { LogPayload } from "./types"
 
 export interface Env {
 	TOKEN: string
+	LOKI_ENDPOINT: string
 }
 
-export type LogShipperFunction = (logs: LogPayload[], env: Env) => Promise<Response>
+export type LogShipperFunction = (logs: LogPayload, env: Env) => Promise<Response>
 
 export default {
 	async fetch(
@@ -39,7 +40,7 @@ export default {
 				data = data + chunk;
 			}
 
-			return logShipper(JSON.parse(data) as LogPayload[], env)
+			return logShipper(JSON.parse(data), env)
 		}
 		return new Response("ok")
 	},
