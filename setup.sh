@@ -15,7 +15,7 @@ curl -X POST "https://api.cloudflare.com/client/v4/accounts/$ACCOUNTID/logpush/j
     \"record_suffix\": \"}\",
     \"record_delimiter\": \",\"
   },
-  \"filter\": \"{\\\"where\\\":{\\\"key\\\":\\\"ScriptName\\\",\\\"operator\\\":\\\"\!eq\\\",\\\"value\\\":\\\"cloudflareworkerslogpush\\\"}}\",
+  \"filter\": \"{\\\"where\\\":{\\\"key\\\":\\\"ScriptName\\\",\\\"operator\\\":\\\"!eq\\\",\\\"value\\\":\\\"cloudflareworkerslogpush\\\"}}\",
   \"destination_conf\": \"https://$SUBDOMAIN.workers.dev/log?header_Authorization=Bearer%20$TOKEN&header_content-type=application%2Fjson\",
   \"dataset\": \"workers_trace_events\",
   \"enabled\": true
