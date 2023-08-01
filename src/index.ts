@@ -17,6 +17,7 @@ export default {
 		if (request.headers.get("content-length") === "4") {
 			console.log("got test")
 			return new Response("ok")
+
 		}
 		if (request.headers.get("content-encoding") === "gzip") {
 			// This is a logpush batch
@@ -39,8 +40,11 @@ export default {
 			for await (let chunk of chunks) {
 				data = data + chunk;
 			}
-
-			return logShipper(JSON.parse(data), env)
+			const jd = JSON.parse(data)
+			if (jd.content === "test") {
+				return new Response("ok")
+			}
+			return logShipper(jd, env)
 		}
 		return new Response("ok")
 	},
