@@ -6,7 +6,7 @@ export interface Env {
 	LOKI_ENDPOINT: string
 }
 
-export type LogShipperFunction = (logs: LogPayload, env: Env) => Promise<Response>
+export type LogShipperFunction = (logs: LogPayload[], env: Env) => Promise<Response>
 
 export default {
 	async fetch(
